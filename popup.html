@@ -1,0 +1,117 @@
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <style>
+    body, input[type=text] {
+      font-size: 12px;
+      font-family: Lucida Grande, Arial, tahoma, verdana, sans-serif;
+    }
+    body {
+      width: 600px;
+      margin: auto;
+      padding: 8px;
+    }
+    #rules {
+      border: 1px solid #aaa;
+      background: #f4f4f4;
+      height: 400px;
+      overflow-y: auto;
+    }
+    .rule {
+      background: #fff;
+      border-top: 1px solid #f0f0f0;
+      border-bottom: 1px solid #cecece;
+      box-shadow: 1px 1px 1px #ddd;
+    }
+    .rule_short {
+      cursor: pointer;
+      padding: 3px 6px;
+      position: relative;
+    }
+    .rule_short input[type=checkbox] {
+      margin: 0 8px 0 16px;
+    }
+    .rule_short .icon {
+      position: absolute;
+      left: 6px;
+      top: 10px;
+      font-size: 10px;
+      font-style: normal;
+      color: #888;
+    }
+    .rule_short .icon:after {
+      content: '▼';
+    }
+    .collapsed .rule_short .icon:after {
+      content: '▶';
+    }
+    .rule_short .name {
+      cursor: text;
+      display: inline-block;
+      height: 15px;
+      margin: 5px 0 5px 3px;
+    }
+    .rule_short .name_input {
+      display: none;
+      width: 526px;
+    }
+    .rule_short .delete {
+      float: right;
+      text-decoration: none;
+      color: #888;
+      cursor: pointer;
+      margin: 5px;
+    }
+    .rule_details {
+      border-top: 1px solid #e0e0e0;
+      margin: 0 6px;
+      padding: 6px 0;
+    }
+    .collapsed .rule_details {
+      display: none;
+    }
+    .rule_details .row {
+      height: 22px;
+    }
+    .rule_details .row span {
+      float: left;
+      width: 200px;
+      margin-top: 3px;
+    }
+    .rule_details .row input[type=text] {
+      margin-top: -1px;
+      height: 21px;
+      width: 361px;
+    }
+    .rule_details .row input[type=radio] {
+      margin-right: 6px;
+    }
+    .rule_details .row label {
+      margin-right: 6px;
+    }
+    .rule_details .row input[type=checkbox] {
+      margin-top: 5px;
+    }
+    #no_rules {
+      font-size: 14px;
+      margin: 190px 0;
+      color: #aaa;
+      text-align: center;
+      text-shadow: -1px -1px 0px #fff;
+    }
+
+    #add_rule {
+      display: block;
+      text-align: center;
+      padding-top: 6px;
+    }
+  </style>
+</head>
+<body>
+  <h3>VK Spoilers</h3>
+  <p>Здесь вы можете настроить правила, согласно которым из вашей ленты ВКонтакте будут скрываться «спойлеры» (посты, содержащие определенные словосочетания).</p>
+  <div id="rules"></div>
+  <a id="add_rule" href="about:blank">добавить правило...</a>
+  <script src="popup.js"></script>
+</body>
+</html>
