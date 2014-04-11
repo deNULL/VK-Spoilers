@@ -1,13 +1,15 @@
 {
+"update_url": "https://clients2.google.com/service/update2/crx",
+
   "name": "VK Spoilers",
-  "version": "1.1",
+  "version": "1.4",
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
     "128": "icon-128.png"
   },
   "manifest_version": 2,
-  "description": "Скрывает из ленты новостей ВКонтакте записи, содержащие определенные словосочетания.",
+  "description": "Скрывает из ленты новостей и со стен ВКонтакте записи, содержащие определенные словосочетания, а также репосты (копии чужих записей)",
   "permissions": [
     "tabs",
     "*://vk.com/*"

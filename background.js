@@ -6,8 +6,10 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
   if (request.method == "getConfig") {
     var rules = [];
+    var config = {};
     try {
       rules = JSON.parse(localStorage['rules'] || '[]') || [];
+      config = JSON.parse(localStorage['config'] || '{}') || {};
     } catch (e) {}
 
     var opened = {};
@@ -15,7 +17,7 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
       opened = JSON.parse(localStorage['opened'] || '{}') || {};
     } catch (e) {}
 
-    sendResponse({ rules: rules, opened: opened });
+    sendResponse({ rules: rules, opened: opened, config: config });
   } else
   if (request.method == "setOpened") {
     var opened = {};
