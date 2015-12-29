@@ -15,15 +15,15 @@ function escapeHtml(text) {
 
 function reloadRules() {
   var rulesHTML = [];
-   
+
     // rule for reposts
     var i = '_reposts';
     var rule = config.reposts;
-	
+
     rulesHTML.push('\
       <div id="rule' + i + '" class="rule collapsed">\
         <div id="rule' + i + '_short" class="rule_short">\
-          <i id="rule' + i + '_icon" class="icon"></i><input id="rule' + i + '_enabled" type="checkbox" value="1"' + (rule.enabled ? ' checked' : '') + '/><span id="rule' + i + '_title" class="name">' + (rule.name) + '</span><input id="rule' + i + '_name" class="name_input" type="text" placeholder="Название правила" value="' + escapeHtml(rule.name) + '"/><a id="rule' + i + '_delete" class="delete" href="about:blank"></a>\
+          <i id="rule' + i + '_icon" class="icon"></i><input id="rule' + i + '_enabled" type="checkbox" value="1"' + (rule.enabled ? ' checked' : '') + '/><span id="rule' + i + '_title" class="name" style="cursor: pointer">' + (rule.name) + '</span><input id="rule' + i + '_name" class="name_input" type="text" placeholder="Название правила" value="' + escapeHtml(rule.name) + '"/><a id="rule' + i + '_delete" class="delete" href="about:blank"></a>\
         </div>\
         <div class="rule_details">\
           <div class="row" style="display:none"><span>Шаблон:</span>\
@@ -37,7 +37,7 @@ function reloadRules() {
             <label><input type="checkbox" id="rule' + i + '_feed" name="rule' + i + '_feed" value="1"' + (rule.scan_feed == 1 ? ' checked' : '') + '/>новостей</label>\
           </div>\
           <div class="row"><span>&nbsp;</span>\
-            <label><input type="checkbox" id="rule' + i + '_allow_quote" name="rule' + i + '_allow_quote" value="0"' + (rule.allow_quote == 1 ? ' checked' : '') + '/>Скрывать только если запись целиком состоит из репоста</label>\
+            <label><input type="checkbox" id="rule' + i + '_allow_quote" name="rule' + i + '_allow_quote" value="0"' + (rule.allow_quote == 1 ? ' checked' : '') + '/>Скрывать только если к репосту нет комментария</label>\
           </div>\
           <div class="row"><span>Посты:</span>\
             <label><input type="radio" id="rule' + i + '_posts_0" name="rule' + i + '_posts" value="0"' + (rule.posts == 0 ? ' checked' : '') + '/>показывать</label>\
@@ -55,7 +55,7 @@ function reloadRules() {
           </div>\
         </div>\
       </div>');
-  
+
   rules.forEach(function(rule, i) {
     rulesHTML.push('\
       <div id="rule' + i + '" class="rule collapsed">\
@@ -89,9 +89,10 @@ function reloadRules() {
   ge('rules').innerHTML = rulesHTML.join(''); //rules.length > 0 ? rulesHTML.join('') : '<div id="no_rules">Ни одного правила ещё не добавлено</div>';
 
   var processRules = function(rule, i) {
-    
-    ge('rule' + i + '_short').onclick = function() {
+
+    ge('rule' + i + '_short').onclick = function(e) {
       ge('rule' + i).className = (ge('rule' + i).className == 'rule') ? 'rule collapsed' : 'rule';
+      return false;
     }
 
     ge('rule' + i + '_enabled').onchange = function() {
@@ -177,7 +178,7 @@ function reloadRules() {
           rule.comments = j;
           saveRules();
         }
-		
+
 		if(j<=1){
 			ge('rule' + i + '_save_' + j).onclick = function() {
 			  rule.save = j;
@@ -189,7 +190,7 @@ function reloadRules() {
   };
 
   rules.forEach(processRules);
-  
+
   try {
     processRules(config.reposts, '_reposts');
     ge('rule_reposts_wall').onclick = function() {
@@ -221,7 +222,7 @@ try {
     config.reposts = {
       name: '<b>Скрыть репосты</b>',
       enabled: true,
-      scan_wall: 1, 
+      scan_wall: 1,
       scan_feed: 1,
       allow_quote: 1,
       posts: 1,

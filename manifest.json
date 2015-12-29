@@ -1,8 +1,8 @@
 {
 "update_url": "https://clients2.google.com/service/update2/crx",
 
-  "name": "VK Spoilers",
-  "version": "1.4",
+  "name": "VK Feed Tweaks (aka VK Spoilers)",
+  "version": "1.5",
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
