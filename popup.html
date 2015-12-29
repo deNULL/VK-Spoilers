@@ -14,7 +14,7 @@
     #rules {
       border: 1px solid #aaa;
       background: #f4f4f4;
-      height: 400px;
+      height: 340px;
       overflow-y: auto;
     }
     .rule {
@@ -83,7 +83,7 @@
       height: 21px;
       width: 361px;
     }
-    .rule_details .row input[type=radio] {
+    input[type=radio] {
       margin-right: 6px;
     }
     .rule_details .row label {
@@ -109,6 +109,14 @@
 </head>
 <body>
   <h3>VK Feed Tweaks</h3>
+  <p>Для перехода к новостям из левого меню использовать:</p>
+  <div style="padding-left: 8px">
+    <label><input type="radio" id="menu_type_0" name="menu_type" value="0"/>Пункт «Мои Новости», ведущий на общую ленту (как обычно)</label><br/>
+    <label><input type="radio" id="menu_type_1" name="menu_type" value="1"/>Пункт «Мои Новости», ведущий на новости друзей</label><br/>
+    <label><input type="radio" id="menu_type_2" name="menu_type" value="2"/>«Мои Новости» (новости друзей) + «Моя Лента» (общая лента)</label><br/>
+    <label><input type="radio" id="menu_type_3" name="menu_type" value="3"/>«Мои Новости» (новости друзей) + «Мои Сообщества» (новости сообществ)</label><br/>
+  </div>
+  <h3>Спойлеры и репосты</h3>
   <p>Здесь вы можете настроить правила, согласно которым из вашей ленты ВКонтакте будут скрываться «спойлеры» (посты, содержащие определённые словосочетания).</p>
   <div id="rules"></div>
   <a id="add_rule" href="about:blank">добавить правило...</a>

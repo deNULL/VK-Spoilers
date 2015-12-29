@@ -247,3 +247,15 @@ ge('add_rule').onclick = function() {
   ge('rule' + (rules.length - 1) + '_title').onclick();
   return false;
 }
+
+if (!config.menu_type) {
+  config.menu_type = 0;
+}
+
+for (var i = 0; i < 4; i++) {
+  ge('menu_type_' + i).checked = (config.menu_type == i);
+  ge('menu_type_' + i).onclick = function(i) {
+    config.menu_type = i;
+    saveRules();
+  }.bind(this, i);
+}

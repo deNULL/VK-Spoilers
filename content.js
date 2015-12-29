@@ -243,6 +243,31 @@ chrome.extension.sendRequest({method: "getConfig"}, function(response) {
   rules = response.rules;
   config = response.config;
   opened = response.opened;
+  if (config.menu_type == 1) {
+    document.querySelector('#l_nwsf > a').setAttribute('href', '/feed?section=friends');
+  } else
+  if (config.menu_type == 2) {
+    var item = document.createElement('li');
+    item.innerHTML = '<a href="/feed" onclick="return nav.go(this, event, {noback: true, params: {_ref: \'left_nav\'}});" class="left_row">' +
+      '<span class="left_fixer">' +
+        '<span class="left_count_wrap  left_void fl_r"><span class="inl_bl left_plus">+</span></span>' +
+        '<span class="left_label inl_bl">Моя Лента</span>' +
+      '</span></a>';
+    var nwsf = ge('l_nwsf');
+    nwsf.parentNode.insertBefore(item, nwsf.nextSibling);
+    document.querySelector('#l_nwsf > a').setAttribute('href', '/feed?section=friends');
+  } else
+  if (config.menu_type == 3) {
+    var item = document.createElement('li');
+    item.innerHTML = '<a href="/feed?section=groups" onclick="return nav.go(this, event, {noback: true, params: {_ref: \'left_nav\'}});" class="left_row">' +
+      '<span class="left_fixer">' +
+        '<span class="left_count_wrap  left_void fl_r"><span class="inl_bl left_plus">+</span></span>' +
+        '<span class="left_label inl_bl">Мои Сообщества</span>' +
+      '</span></a>';
+    var nwsf = ge('l_nwsf');
+    nwsf.parentNode.insertBefore(item, nwsf.nextSibling);
+    document.querySelector('#l_nwsf > a').setAttribute('href', '/feed?section=friends');
+  }
   (new MutationObserver(function(mutations, observer) {
     mutations.forEach(function(mutation) {
       if (mutation.target.id == 'wrap3' || mutation.target.id == 'profile_wide' || mutation.target.id == 'results_wrap') {
@@ -257,3 +282,4 @@ chrome.extension.sendRequest({method: "getConfig"}, function(response) {
   });
   update();
 });
+
