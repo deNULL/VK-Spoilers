@@ -14,7 +14,7 @@
     #rules {
       border: 1px solid #aaa;
       background: #f4f4f4;
-      height: 340px;
+      height: 310px;
       overflow-y: auto;
     }
     .rule {
@@ -83,7 +83,7 @@
       height: 21px;
       width: 361px;
     }
-    input[type=radio] {
+    input[type=radio], input[type=checkbox] {
       margin-right: 6px;
     }
     .rule_details .row label {
@@ -109,6 +109,7 @@
 </head>
 <body>
   <h3>VK Feed Tweaks</h3>
+  <label><input type="checkbox" id="save_position" name="save_position"/>Открывать ленту с последней прочитанной новости</label><br/>
   <p>Для перехода к новостям из левого меню использовать:</p>
   <div style="padding-left: 8px">
     <label><input type="radio" id="menu_type_0" name="menu_type" value="0"/>Пункт «Мои Новости», ведущий на общую ленту (как обычно)</label><br/>

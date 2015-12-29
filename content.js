@@ -70,7 +70,7 @@ function update(list) {
     var hideRepost = 0;
 
     var appliedRules = [];
-	var appliedRulesPars = [];
+    var appliedRulesPars = [];
 
     var postText = geByClass('wall_post_text', post);
     postText.forEach(function(text) {
@@ -104,7 +104,7 @@ function update(list) {
             if (rule.name && appliedRules.indexOf('<b>' + rule.name + '</b>') == -1) {
               appliedRules.push('<b>' + rule.name + '</b>');
             }
-			appliedRulesPars.push(rule);
+			      appliedRulesPars.push(rule);
           }
         }
       });
@@ -117,41 +117,38 @@ function update(list) {
     var hideRepost = false;
 
     // hide reposts
-    if (scanRepostsEnabled)
-    if (
-         ( scanWallForReposts && isObject(ge('page_wall_posts' ))) ||
-         ( scanFeedForReposts && (isObject(ge('feed_rows')) || isObject(ge('results'))) )
-       )
-    {
-      var isRepost = false;
-      var isRepostWithText = false;
+    if (scanRepostsEnabled) {
+      if ((scanWallForReposts && isObject(ge('page_wall_posts' ))) ||
+          (scanFeedForReposts && (isObject(ge('feed_rows')) || isObject(ge('results'))))) {
+        var isRepost = false;
+        var isRepostWithText = false;
 
-      repostText = geByClass('published_by_wrap', post);
-      repostText.forEach(function(text) {
-        isRepost = true;
-      });
+        repostText = geByClass('published_by_wrap', post);
+        repostText.forEach(function(text) {
+          isRepost = true;
+        });
 
-      // reposts as quote
-      var repostText = geByClass('published_by_quote', post);
-      repostText.forEach(function(text) {
-        isRepostWithText = true;
-      });
+        // reposts as quote
+        var repostText = geByClass('published_by_quote', post);
+        repostText.forEach(function(text) {
+          isRepostWithText = true;
+        });
 
-      if (isRepost && (!isRepostWithText || !config.reposts.allow_quote))
-      {
-        hideBody = config.reposts.posts;
-        hideComments = config.reposts.comments;
-        hideRepost = true;
-		appliedRulesPars.push(config.reposts);
+        if (isRepost && (!isRepostWithText || !config.reposts.allow_quote)) {
+          hideBody = config.reposts.posts;
+          hideComments = config.reposts.comments;
+          hideRepost = true;
+  		    appliedRulesPars.push(config.reposts);
+        }
       }
     }
 
-	post.save_mode = 0;
-	appliedRulesPars.forEach(function(rule){
-		if(rule.save == 1) post.save_mode = 1;
-	});
+  	post.save_mode = 0;
+  	appliedRulesPars.forEach(function(rule){
+  		if(rule.save == 1) post.save_mode = 1;
+  	});
 
-	if ((opened[post.id] & 1) != 0) {
+  	if ((opened[post.id] & 1) != 0) {
       hideBody = 0;
     }
     if ((opened[post.id] & 2) != 0) {
@@ -194,10 +191,10 @@ function update(list) {
         }
         bodySpoiler.style.display = 'none';
 
-		if(post.save_mode == 1){
+		    if(post.save_mode == 1){
        		opened[post.id] = opened[post.id] | state;
         	chrome.extension.sendRequest({method: "setOpened", id: post.id, state: state});
-		}
+		    }
       }
     }
 
@@ -211,15 +208,40 @@ function update(list) {
           commentsSpoiler.style.display = 'none';
           postComments.style.display = 'block';
 
-		  if(post.save_mode == 1){
+    		  if(post.save_mode == 1) {
           	opened[post.id] = opened[post.id] | 2;
-          	chrome.extension.sendRequest({method: "setOpened", id: post.id, state: 2});
-		  }
+            chrome.extension.sendRequest({method: 'setOpened', id: post.id, state: 2});
+    		  }
         }
       }
     }
 
     post.processed = true;
+  });
+
+  setTimeout(function() {
+    checkLocation();
+  }, 5);
+}
+
+function updateLastRead() {
+  var list = ge('page_wall_posts') || ge('feed_rows') || ge('results') || document.body;
+
+  geByClass('post', list).forEach(function(post) {
+    var tm = geByClass('rel_date', post);
+    if (tm && tm[0]) {
+      var time = parseInt(tm[0].getAttribute('time'), 10);
+      var rect = post.getBoundingClientRect();
+      if (rect.top > 0) {
+        config.lastread = config.lastread || {};
+
+        if (!config.lastread[section] || config.lastread[section].time < time) {
+          config.lastread[section] = { time: time, id: post.id };
+          console.log('Set last read to ', config.lastread[section]);
+          chrome.extension.sendRequest({method: 'saveConfig', config: config });
+        }
+      }
+    }
   });
 }
 
@@ -237,9 +259,127 @@ function togglePost(spoiler) {
   spoiler.style.display = 'none';
 }
 
+var scrollingTo = false;
+var path = false;
+var section = false;
+function checkLocation() {
+  if (!config.save_position) {
+    section = false;
+    return;
+  }
+  config.lastread = config.lastread || {};
+  if (document.location.pathname != '/feed') {
+    path = document.location.pathname;
+    section = false;
+    return;
+  }
+  if (path == document.location.pathname + document.location.search) {
+    if (scrollingTo) {
+      scrollToPost(scrollingTo);
+    }
+    return;
+  }
+
+  var m = document.location.search.match(/[&?]section=([a-z]+)/);
+  section = (m && m[1]) || 'feed';
+  if (section != 'recommended' && section != 'search' && section != 'comments' && section != 'updates') {
+    console.log('SECTION=', section);
+    var last = config.lastread[section];
+    console.log('LAST POST=', last);
+
+    var list = ge('page_wall_posts') || ge('feed_rows') || ge('results') || document.body;
+    var posts = geByClass('post', list);
+
+    if (last && (new Date()).getTime() / 1000 - last.time < (60 * 60 * 24 * 3)) {
+      // Hurr durr, do something
+      scrollToPost(last);
+    } else {
+      // Yay, nothing to do!
+      // Except saving the last one now.
+      if (posts.length) {
+        var tm = geByClass('rel_date', posts[0]);
+        if (tm && tm[0]) {
+          config.lastread[section] = { time: parseInt(tm[0].getAttribute('time'), 10), id: posts[0].id };
+          console.log('Set last read to ', config.lastread[section]);
+          chrome.extension.sendRequest({method: 'saveConfig', config: config });
+        }
+      }
+    }
+  }
+  path = document.location.pathname + document.location.search;
+}
+function scrollToPost(targ) {
+  var list = ge('page_wall_posts') || ge('feed_rows') || ge('results') || document.body;
+  var prev = false;
+  var found = false;
+  var pre = [];
+  geByClass('post', list).forEach(function(post, index) {
+    if (found) {
+      return;
+    }
+    var tm = geByClass('rel_date', post);
+    if (post.id == targ.id) {
+      found = (index < 1) ? true : post;
+      return;
+    }
+    if (tm && tm[0]) {
+      var time = parseInt(tm[0].getAttribute('time'), 10);
+      if (time < targ.time) {
+        found = (index < 1) ? true : (prev || true);
+        return;
+      }
+    }
+    prev = post;
+    if (!found) {
+      pre.push(post);
+    }
+  });
+
+  if (found) {
+    if (found !== true) {
+      function check() {
+        found.scrollIntoView({ behavior: 'smooth' });
+        if (!imagesCnt) {
+          scrollingTo = false;
+        }
+      }
+      // Wait for all images within pre to load
+      var imagesCnt = 0;
+      pre.forEach(function(post) {
+        var images = post.getElementsByTagName('IMG');
+        for (var i = 0; i < images.length; i++) {
+          var img = images[i];
+          if (!img.complete) {
+            imagesCnt++;
+            img.onload = function() {
+              imagesCnt--;
+              check();
+            }
+            img.onerror = function() {
+              imagesCnt--;
+              check();
+            }
+          }
+        };
+      });
+      if (!imagesCnt) {
+        setTimeout(check, 10);
+      }
+      found.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    scrollingTo = false;
+  } else {
+    scrollingTo = targ;
+    var more = ge('show_more_link');
+    more && more.click();
+    window.scrollTo(0, document.body.scrollHeight);
+  }
+}
+
 var rules = [];
 var opened = {};
-chrome.extension.sendRequest({method: "getConfig"}, function(response) {
+chrome.extension.sendRequest({method: 'getConfig'}, function(response) {
   rules = response.rules;
   config = response.config;
   opened = response.opened;
@@ -281,5 +421,11 @@ chrome.extension.sendRequest({method: "getConfig"}, function(response) {
     subtree: true
   });
   update();
+  window.onscroll = function() {
+    if (section && !scrollingTo) {
+      // Get first visible element, store it
+      updateLastRead();
+    }
+  }
 });
 

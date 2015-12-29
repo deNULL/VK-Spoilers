@@ -19,6 +19,9 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
     sendResponse({ rules: rules, opened: opened, config: config });
   } else
+  if (request.method == 'saveConfig') {
+    localStorage['config'] = JSON.stringify(request.config);
+  } else
   if (request.method == "setOpened") {
     var opened = {};
     try {

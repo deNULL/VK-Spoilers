@@ -37,7 +37,7 @@ function reloadRules() {
             <label><input type="checkbox" id="rule' + i + '_feed" name="rule' + i + '_feed" value="1"' + (rule.scan_feed == 1 ? ' checked' : '') + '/>новостей</label>\
           </div>\
           <div class="row"><span>&nbsp;</span>\
-            <label><input type="checkbox" id="rule' + i + '_allow_quote" name="rule' + i + '_allow_quote" value="0"' + (rule.allow_quote == 1 ? ' checked' : '') + '/>Скрывать только если к репосту нет комментария</label>\
+            <label><input type="checkbox" id="rule' + i + '_allow_quote" name="rule' + i + '_allow_quote" value="0"' + (rule.allow_quote == 1 ? ' checked' : '') + '/>скрывать только если к репосту нет комментария</label>\
           </div>\
           <div class="row"><span>Посты:</span>\
             <label><input type="radio" id="rule' + i + '_posts_0" name="rule' + i + '_posts" value="0"' + (rule.posts == 0 ? ' checked' : '') + '/>показывать</label>\
@@ -218,7 +218,7 @@ var rules = [];
 try {
   rules = JSON.parse(localStorage['rules'] || '[]') || [];
   config = JSON.parse(localStorage['config'] || '{}') || {};
-  if (!isObject(config.reposts))
+  if (!isObject(config.reposts)) {
     config.reposts = {
       name: '<b>Скрыть репосты</b>',
       enabled: true,
@@ -229,6 +229,7 @@ try {
       comments: 2,
 	  save: 0
     };
+  }
 } catch (e) {}
 reloadRules();
 
@@ -248,9 +249,19 @@ ge('add_rule').onclick = function() {
   return false;
 }
 
+
+config.save_position = !!config.save_position;
+
+ge('save_position').checked = config.save_position;
+ge('save_position').onclick = function() {
+  config.save_position = ge('save_position').checked;
+  saveRules();
+}
+
 if (!config.menu_type) {
   config.menu_type = 0;
 }
+
 
 for (var i = 0; i < 4; i++) {
   ge('menu_type_' + i).checked = (config.menu_type == i);
