@@ -282,7 +282,7 @@ function checkLocation() {
 
   var m = document.location.search.match(/[&?]section=([a-z]+)/);
   section = (m && m[1]) || 'feed';
-  if (section != 'recommended' && section != 'search' && section != 'comments' && section != 'updates') {
+  if (section != 'recommended' && section != 'search' && section != 'comments' && section != 'updates' && section != 'notifications') {
     console.log('SECTION=', section);
     var last = config.lastread[section];
     console.log('LAST POST=', last);
@@ -312,22 +312,25 @@ function scrollToPost(targ) {
   var list = ge('page_wall_posts') || ge('feed_rows') || ge('results') || document.body;
   var prev = false;
   var found = false;
+  var last = false;
   var pre = [];
   geByClass('post', list).forEach(function(post, index) {
+    var tm = geByClass('rel_date', post);
+    var time;
+    if (tm && tm[0]) {
+      time = parseInt(tm[0].getAttribute('time'), 10);
+      last = time;
+    }
     if (found) {
       return;
     }
-    var tm = geByClass('rel_date', post);
     if (post.id == targ.id) {
       found = (index < 1) ? true : post;
       return;
     }
-    if (tm && tm[0]) {
-      var time = parseInt(tm[0].getAttribute('time'), 10);
-      if (time < targ.time) {
-        found = (index < 1) ? true : (prev || true);
-        return;
-      }
+    if (time && time < targ.time) {
+      found = (index < 1) ? true : (prev || true);
+      return;
     }
     prev = post;
     if (!found) {
@@ -370,10 +373,14 @@ function scrollToPost(targ) {
     }
     scrollingTo = false;
   } else {
-    scrollingTo = targ;
-    var more = ge('show_more_link');
-    more && more.click();
-    window.scrollTo(0, document.body.scrollHeight);
+    if (last && last > targ.time) {
+      scrollingTo = targ;
+      var more = ge('show_more_link');
+      more && more.click();
+      window.scrollTo(0, document.body.scrollHeight);
+    } else {
+      scrollingTo = false;
+    }
   }
 }
 

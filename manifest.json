@@ -2,14 +2,14 @@
 "update_url": "https://clients2.google.com/service/update2/crx",
 
   "name": "VK Feed Tweaks (aka VK Spoilers)",
-  "version": "1.5",
+  "version": "1.6",
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
     "128": "icon-128.png"
   },
   "manifest_version": 2,
-  "description": "Скрывает из ленты новостей и со стен ВКонтакте записи, содержащие определенные словосочетания, а также репосты (копии чужих записей)",
+  "description": "Позволяет настроить ленту новостей ВКонтакте: cкрывать записи по шаблону, репосты; открывать ленту с последнего прочитанного поста.",
   "permissions": [
     "tabs",
     "*://vk.com/*"
