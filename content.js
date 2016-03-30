@@ -65,6 +65,8 @@ function update(list) {
       return;
     }
 
+    var isCommunityPost = post.id && (post.id.substr(0, 5) == 'post-');
+
     var hideBody = 0;
     var hideComments = 0;
     var hideRepost = 0;
@@ -110,10 +112,12 @@ function update(list) {
       });
     });
 
+    var repostsPolicy = (config || {})[isCommunityPost ? 'repostsPub' : 'reposts'] || {};
+
     // hide reposts config
-    var scanWallForReposts = ((config || {}).reposts || {}).scan_wall || false;
-    var scanFeedForReposts = ((config || {}).reposts || {}).scan_feed || false;
-    var scanRepostsEnabled = ((config || {}).reposts || {}).enabled || false;
+    var scanWallForReposts = repostsPolicy.scan_wall || false;
+    var scanFeedForReposts = repostsPolicy.scan_feed || false;
+    var scanRepostsEnabled = repostsPolicy.enabled || false;
     var hideRepost = false;
 
     // hide reposts
@@ -134,11 +138,11 @@ function update(list) {
           isRepostWithText = true;
         });
 
-        if (isRepost && (!isRepostWithText || !config.reposts.allow_quote)) {
-          hideBody = config.reposts.posts;
-          hideComments = config.reposts.comments;
+        if (isRepost && (!isRepostWithText || !repostsPolicy.allow_quote)) {
+          hideBody = repostsPolicy.posts;
+          hideComments = repostsPolicy.comments;
           hideRepost = true;
-  		    appliedRulesPars.push(config.reposts);
+  		  appliedRulesPars.push(repostsPolicy);
         }
       }
     }
@@ -282,7 +286,7 @@ function checkLocation() {
 
   var m = document.location.search.match(/[&?]section=([a-z]+)/);
   section = (m && m[1]) || 'feed';
-  if (section != 'recommended' && section != 'search' && section != 'comments' && section != 'updates' && section != 'notifications') {
+  if (section != 'recommended' && section != 'search' && section != 'comments' && section != 'updates' && section != 'notifications' && section != 'replies') {
     console.log('SECTION=', section);
     var last = config.lastread[section];
     console.log('LAST POST=', last);

@@ -16,9 +16,10 @@ function escapeHtml(text) {
 function reloadRules() {
   var rulesHTML = [];
 
+  for (var j = 0; j <= 1; j++) {
     // rule for reposts
-    var i = '_reposts';
-    var rule = config.reposts;
+    var i = '_' + (j ? 'repostsPub' : 'reposts');
+    var rule = config[j ? 'repostsPub' : 'reposts'];
 
     rulesHTML.push('\
       <div id="rule' + i + '" class="rule collapsed">\
@@ -55,6 +56,7 @@ function reloadRules() {
           </div>\
         </div>\
       </div>');
+  }
 
   rules.forEach(function(rule, i) {
     rulesHTML.push('\
@@ -104,7 +106,7 @@ function reloadRules() {
       e.stopPropagation();
     }
 
-    if (i != '_reposts')
+    if (i != '_reposts' && i != '_repostsPub')
       ge('rule' + i + '_title').onclick = function(e) {
         this.style.display = 'none';
         ge('rule' + i + '_name').style.display = 'inline-block';
@@ -192,18 +194,23 @@ function reloadRules() {
   rules.forEach(processRules);
 
   try {
-    processRules(config.reposts, '_reposts');
-    ge('rule_reposts_wall').onclick = function() {
-      config.reposts.scan_wall = ge('rule_reposts_wall').checked;
-      saveRules();
-    }
-    ge('rule_reposts_feed').onclick = function() {
-      config.reposts.scan_feed = ge('rule_reposts_feed').checked;
-      saveRules();
-    }
-    ge('rule_reposts_allow_quote').onclick = function() {
-      config.reposts.allow_quote = ge('rule_reposts_allow_quote').checked;
-      saveRules();
+    for (var j = 0; j <= 1; j++) {
+      (function(j) {
+        var type = j ? 'repostsPub' : 'reposts';
+        processRules(config[type], '_' + type);
+        ge('rule_' + type + '_wall').onclick = function() {
+          config[type].scan_wall = ge('rule_' + type + '_wall').checked;
+          saveRules();
+        }
+        ge('rule_' + type + '_feed').onclick = function() {
+          config[type].scan_feed = ge('rule_' + type + '_feed').checked;
+          saveRules();
+        }
+        ge('rule_' + type + '_allow_quote').onclick = function() {
+          config[type].allow_quote = ge('rule_' + type + '_allow_quote').checked;
+          saveRules();
+        }
+      })(j);
     }
   } catch (e) {}
 }
@@ -220,7 +227,7 @@ try {
   config = JSON.parse(localStorage['config'] || '{}') || {};
   if (!isObject(config.reposts)) {
     config.reposts = {
-      name: '<b>Скрыть репосты</b>',
+      name: '<b>Скрыть репосты, сделанные пользователями</b>',
       enabled: true,
       scan_wall: 1,
       scan_feed: 1,
@@ -229,6 +236,24 @@ try {
       comments: 2,
 	  save: 0
     };
+    saveRules();
+  } else {
+    config.reposts.name = '<b>Скрыть репосты, сделанные пользователями</b>';
+  }
+  if (!isObject(config.repostsPub)) {
+    config.repostsPub = {
+      name: '<b>Скрыть репосты, сделанные сообществами (взаиморепосты)</b>',
+      enabled: true,
+      scan_wall: 1,
+      scan_feed: 1,
+      allow_quote: 0,
+      posts: 2,
+      comments: 2,
+	  save: 0
+    };
+    saveRules();
+  } else {
+    config.repostsPub.name = '<b>Скрыть репосты, сделанные сообществами (взаиморепосты)</b>';
   }
 } catch (e) {}
 reloadRules();
