@@ -242,7 +242,7 @@ try {
   }
   if (!isObject(config.repostsPub)) {
     config.repostsPub = {
-      name: '<b>Скрыть репосты, сделанные сообществами (взаиморепосты)</b>',
+      name: '<b>Скрыть репосты, сделанные сообществами («взаимопиар»)</b>',
       enabled: true,
       scan_wall: 1,
       scan_feed: 1,
@@ -253,7 +253,7 @@ try {
     };
     saveRules();
   } else {
-    config.repostsPub.name = '<b>Скрыть репосты, сделанные сообществами (взаиморепосты)</b>';
+    config.repostsPub.name = '<b>Скрыть репосты, сделанные сообществами («взаимопиар»)</b>';
   }
 } catch (e) {}
 reloadRules();
