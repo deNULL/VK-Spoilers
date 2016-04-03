@@ -60,6 +60,7 @@ function getKeywords(rule) {
 function update(list) {
   list = list || ge('page_wall_posts') || ge('feed_rows') || ge('results') || document.body;
 
+  var oldBlocked = blocked;
   geByClass('post', list).forEach(function(post) {
     if (post.processed || opened[post.id] == 3) {
       return;
@@ -124,19 +125,27 @@ function update(list) {
     if (scanRepostsEnabled) {
       if ((scanWallForReposts && isObject(ge('page_wall_posts' ))) ||
           (scanFeedForReposts && (isObject(ge('feed_rows')) || isObject(ge('results'))))) {
-        var isRepost = false;
+        var isRepost = post.classList.contains('post_copy');
         var isRepostWithText = false;
 
-        repostText = geByClass('published_by_wrap', post);
-        repostText.forEach(function(text) {
-          isRepost = true;
-        });
+        if (!isRepost) {
+          repostText = geByClass('published_by_wrap', post);
+          repostText.forEach(function(text) {
+            isRepost = true;
+          });
+        }
 
         // reposts as quote
-        var repostText = geByClass('published_by_quote', post);
+        var repostText = geByClass('published_comment', post);
         repostText.forEach(function(text) {
           isRepostWithText = true;
         });
+        if (!isRepostWithText) {
+          repostText = geByClass('published_by_quote', post);
+          repostText.forEach(function(text) {
+            isRepostWithText = true;
+          });
+        }
 
         if (isRepost && (!isRepostWithText || !repostsPolicy.allow_quote)) {
           hideBody = repostsPolicy.posts;
@@ -168,12 +177,15 @@ function update(list) {
 
     if (hideBody == 2) { // totally remove post
       post.style.display = 'none';
+      post.processed = true;
+      console.log('blocked!', post);
+      blocked++;
       return;
     }
 
     if (hideBody) {
       var old = {};
-      for (var i = postBody.children.length-1; i >= 1; i--) {
+      for (var i = postBody.children.length - 1; i >= 1; i--) {
         old[i] = postBody.children[i];
         postBody.removeChild(postBody.children[i]);
         //old[i] = postBody.children[i].style.display;
@@ -195,11 +207,13 @@ function update(list) {
         }
         bodySpoiler.style.display = 'none';
 
-		    if(post.save_mode == 1){
+		    if (post.save_mode == 1) {
        		opened[post.id] = opened[post.id] | state;
-        	chrome.extension.sendRequest({method: "setOpened", id: post.id, state: state});
+        	chrome.extension.sendRequest({method: 'setOpened', id: post.id, state: state});
 		    }
       }
+      console.log('blocked!', post);
+      blocked++;
     }
 
     if (hideComments && postComments) {
@@ -222,6 +236,10 @@ function update(list) {
 
     post.processed = true;
   });
+
+  if (blocked != oldBlocked) {
+    chrome.extension.sendRequest({ method: 'setCounter', count: blocked });
+  }
 
   setTimeout(function() {
     checkLocation();
@@ -390,6 +408,7 @@ function scrollToPost(targ) {
 
 var rules = [];
 var opened = {};
+var blocked = 0;
 chrome.extension.sendRequest({method: 'getConfig'}, function(response) {
   rules = response.rules;
   config = response.config;
@@ -422,6 +441,8 @@ chrome.extension.sendRequest({method: 'getConfig'}, function(response) {
   (new MutationObserver(function(mutations, observer) {
     mutations.forEach(function(mutation) {
       if (mutation.target.id == 'wrap3' || mutation.target.id == 'profile_wide' || mutation.target.id == 'results_wrap') {
+        blocked = 0;
+        chrome.extension.sendRequest({ method: 'setCounter', count: blocked });
         update();
       } else if (mutation.target.id == 'page_wall_posts' || mutation.target.id == 'feed_rows' || mutation.target.id.indexOf('feed_row') === 0) {
         update(mutation.target);
