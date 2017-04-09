@@ -66,6 +66,13 @@ function update(list) {
       return;
     }
 
+    if (geByClass('wall_marked_as_ads', post).length > 0){
+      post.style.display = 'none';
+      post.processed = true;
+      console.log('blocked!', post);
+      blocked++;
+      return;
+    }
     var isCommunityPost = post.id && (post.id.substr(0, 5) == 'post-');
 
     var hideBody = 0;
@@ -112,7 +119,7 @@ function update(list) {
         }
       });
     });
-
+    
     var repostsPolicy = (config || {})[isCommunityPost ? 'repostsPub' : 'reposts'] || {};
 
     // hide reposts config
